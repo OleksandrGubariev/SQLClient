@@ -1,4 +1,4 @@
-package com.sqlclient.util;
+package com.sqlclient.entity;
 
 import lombok.Builder;
 import lombok.Data;

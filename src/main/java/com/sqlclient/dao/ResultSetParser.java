@@ -1,6 +1,6 @@
 package com.sqlclient.dao;
 
-import com.sqlclient.util.QueryResult;
+import com.sqlclient.entity.QueryResult;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
