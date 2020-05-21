@@ -14,8 +14,8 @@ import java.util.Properties;
 
 public class Starter {
     public static void main(String[] args) throws ServletException, LifecycleException {
-        PropertyReader propertyReader = new PropertyReader("application.properties");
-        Properties properties = propertyReader.getProperties();
+
+        Properties properties = ServiceLocator.getService(PropertyReader.class).getProperties();
 
 //      server config
         int port = Integer.parseInt(properties.getProperty("port"));

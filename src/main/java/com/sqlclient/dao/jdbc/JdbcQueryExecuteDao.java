@@ -1,6 +1,9 @@
-package com.sqlclient.dao;
+package com.sqlclient.dao.jdbc;
 
+import com.sqlclient.dao.QueryExecuteDao;
+import com.sqlclient.dao.parser.ResultSetParser;
 import com.sqlclient.entity.QueryResult;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
@@ -10,12 +13,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
 @Slf4j
-public class QueryExecutor {
-    private DataSource dataSource;
-
-    public QueryExecutor(DataSource dataSource) {
-        this.dataSource = dataSource;
-    }
+@RequiredArgsConstructor
+public class JdbcQueryExecuteDao implements QueryExecuteDao {
+    private final DataSource dataSource;
 
     @SneakyThrows
     public QueryResult queryExecuteSelect(String query) {
