@@ -1,8 +1,8 @@
-package com.sqlclient.service;
+package com.sqlclient.dao;
 
 import com.sqlclient.entity.QueryResult;
 
-public interface QueryExecuteService {
+public interface QueryExecuteDao {
     QueryResult queryExecuteSelect(String query);
 
     int queryExecute(String query);
