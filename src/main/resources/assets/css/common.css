@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Indie+Flower&display=swap');
+
 /* Reset styles */
 html, body, div, span, applet, object, iframe,
 h1, h2, h3, h4, h5, h6, p, blockquote, pre,
@@ -65,4 +67,30 @@ html, body {
     max-width: 1200px;
     padding: 0 10px;
     margin: 0 auto;
+}
+
+.content {
+    background-color: #f9f9f9;
+    flex: 1 1 auto;
+}
+
+header {
+    padding: 50px 0;
+}
+
+.header__body {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.header__logo {
+    border-top: 3px solid #a11;
+    border-bottom: 3px solid #a11;
+    font-family: 'Indie Flower', sans-serif;
+}
+
+.input-request__field {
+    width: 1200px;
+    height: 300px
 }
