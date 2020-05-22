@@ -32,7 +32,7 @@ public class ResultSetParser {
             rows.add(rowValues);
         }
         return QueryResult.builder()
-                .columnName(columnName)
+                .columnNames(columnName)
                 .columnValues(rows).build();
     }
 }

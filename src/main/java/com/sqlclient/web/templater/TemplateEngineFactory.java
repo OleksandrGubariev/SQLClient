@@ -1,42 +1,36 @@
 package com.sqlclient.web.templater;
 
-import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
 import org.thymeleaf.TemplateEngine;
-import org.thymeleaf.context.IContext;
-import org.thymeleaf.context.WebContext;
-import org.thymeleaf.extras.java8time.dialect.Java8TimeDialect;
-import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
+import org.thymeleaf.context.Context;
+import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.Locale;
+import java.io.Writer;
 import java.util.Map;
 
-@Slf4j
 public class TemplateEngineFactory {
     private static final TemplateEngine TEMPLATE_ENGINE = new TemplateEngine();
-    private static boolean isConfig;
+    private static boolean isConfigured;
 
-    public static void configTemplate(ServletContext servletContext) {
-        if (isConfig) {
-            return;
+    public static void process(String template, Map<String, Object> paramsMap, Writer writer) {
+        if (!isConfigured) {
+            configTemplate();
         }
-        isConfig = true;
-        ServletContextTemplateResolver templateResolver = new ServletContextTemplateResolver(servletContext);
-        templateResolver.setPrefix("/WEB-INF/templates/");
-        templateResolver.setSuffix(".html");
-        templateResolver.setTemplateMode("HTML");
-        TEMPLATE_ENGINE.addDialect(new Java8TimeDialect());
-        TEMPLATE_ENGINE.setTemplateResolver(templateResolver);
+        Context context = new Context();
+        context.setVariables(paramsMap);
+        TEMPLATE_ENGINE.process(template, context, writer);
     }
 
-    @SneakyThrows
-    public static void process(HttpServletRequest request, HttpServletResponse response, String template,
-                               Map<String, Object> parameters) {
-        IContext context = new WebContext(request, response, request.getServletContext(), Locale.ENGLISH,
-                parameters);
-        TEMPLATE_ENGINE.process(template, context, response.getWriter());
+    public static void process(String template, Writer writer) {
+        process(template, null, writer);
+    }
+
+    private static void configTemplate() {
+        ClassLoaderTemplateResolver templateResolver = new ClassLoaderTemplateResolver();
+        templateResolver.setPrefix("/templates/");
+        templateResolver.setSuffix(".html");
+        templateResolver.setTemplateMode("HTML");
+        templateResolver.setCharacterEncoding("UTF-8");
+        TEMPLATE_ENGINE.setTemplateResolver(templateResolver);
+        isConfigured = true;
     }
 }

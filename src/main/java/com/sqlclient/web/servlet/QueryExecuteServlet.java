@@ -1,15 +1,11 @@
 package com.sqlclient.web.servlet;
 
-import com.sqlclient.ServiceLocator;
 import com.sqlclient.entity.QueryResult;
-import com.sqlclient.entity.QueryType;
 import com.sqlclient.service.QueryExecuteService;
-import com.sqlclient.util.QueryTypeParser;
 import com.sqlclient.web.templater.TemplateEngineFactory;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -18,22 +14,20 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Slf4j
-@WebServlet(name = "QueryExecuteServlet", urlPatterns = "/")
+@RequiredArgsConstructor
 public class QueryExecuteServlet extends HttpServlet {
-    private final QueryExecuteService queryExecuteService = ServiceLocator.getService(QueryExecuteService.class);
-    private final QueryTypeParser queryTypeParser = ServiceLocator.getService(QueryTypeParser.class);
+
+    private final QueryExecuteService queryExecuteService;
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         log.info("Request get SQL client page");
-
-
         response.setContentType("text/html;charset=utf-8");
-        TemplateEngineFactory.process(request, response, "index", null);
+        TemplateEngineFactory.process("index", response.getWriter());
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
         String query = request.getParameter("sqlRequest");
         if (query == null) {
@@ -41,21 +35,12 @@ public class QueryExecuteServlet extends HttpServlet {
             return;
         }
         log.info("Executing query {}", query);
-        QueryType queryType = queryTypeParser.queryParse(query);
         Map<String, Object> paramsMap = new HashMap<>();
         paramsMap.put("query", query);
-        if (queryType == null) {
-            paramsMap.put("systemInfo", "ERROR: syntax error");
-        } else if (queryType == QueryType.SELECT) {
-            QueryResult queryResult = queryExecuteService.queryExecuteSelect(query);
-            paramsMap.put("columnNames", queryResult.getColumnName());
-            paramsMap.put("columnValueLists", queryResult.getColumnValues());
-        } else {
-            int count = queryExecuteService.queryExecute(query);
-            paramsMap.put("systemInfo", count);
-        }
+        QueryResult queryResult = queryExecuteService.queryExecute(query);
+        paramsMap.put("queryResult", queryResult);
 
         response.setContentType("text/html;charset=utf-8");
-        TemplateEngineFactory.process(request, response, "index", paramsMap);
+        TemplateEngineFactory.process("index", paramsMap, response.getWriter());
     }
 }
