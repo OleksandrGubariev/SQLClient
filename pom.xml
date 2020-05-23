@@ -29,7 +29,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>Starter</mainClass>
+                            <mainClass>com.sqlclient.Starter</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>
