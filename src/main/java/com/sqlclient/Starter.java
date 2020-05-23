@@ -1,45 +1,45 @@
 package com.sqlclient;
 
+import com.sqlclient.config.DataSourceFactory;
 import com.sqlclient.config.PropertyReader;
-import org.apache.catalina.LifecycleException;
-import org.apache.catalina.WebResourceRoot;
-import org.apache.catalina.core.StandardContext;
-import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.webresources.DirResourceSet;
-import org.apache.catalina.webresources.StandardRoot;
+import com.sqlclient.dao.jdbc.JdbcQueryExecuteDao;
+import com.sqlclient.service.QueryExecuteService;
+import com.sqlclient.web.servlet.GetStaticResourcesServlet;
+import com.sqlclient.web.servlet.QueryExecuteServlet;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
 
-import javax.servlet.ServletException;
-import java.io.File;
+import javax.sql.DataSource;
 import java.util.Properties;
 
 public class Starter {
-    public static void main(String[] args) throws ServletException, LifecycleException {
+    public static void main(String[] args) throws Exception {
 
-        Properties properties = ServiceLocator.getService(PropertyReader.class).getProperties();
+        Properties properties = new PropertyReader("application.properties").getProperties();
+        DataSource dataSource = new DataSourceFactory(properties).getDataSource();
+        JdbcQueryExecuteDao queryExecuteDao = new JdbcQueryExecuteDao(dataSource);
+        QueryExecuteService queryExecuteService = new QueryExecuteService(queryExecuteDao);
+
+        //servlets
+        QueryExecuteServlet queryExecuteServlet = new QueryExecuteServlet(queryExecuteService);
+
+        ServletContextHandler handler = new ServletContextHandler();
+
+        ServletHolder queryExecuteHolder = new ServletHolder(queryExecuteServlet);
+        handler.addServlet(queryExecuteHolder, "");
+
+        ServletHolder getStaticResourcesHolder = new ServletHolder(new GetStaticResourcesServlet());
+        handler.addServlet(getStaticResourcesHolder, "/assets/*");
 
 //      server config
         int port = Integer.parseInt(properties.getProperty("port"));
-        String contextPath = "/";
-        String webappDirLocation = "src/main/webapp/";
-        String baseDirectory = new File(webappDirLocation).getAbsolutePath();
 
-//      tomcat config
-        Tomcat tomcat = new Tomcat();
-        tomcat.setPort(port);
-        StandardContext standardContext = (StandardContext) tomcat.addWebapp(contextPath, baseDirectory);
+        Server server = new Server(port);
+        server.setHandler(handler);
+        server.start();
 
-//      Web servlet annotation config
-        String buildPath = "target/classes";
-        String webAppMount = "/WEB-INF/classes";
+        server.join();
 
-        File additionalWebInfClasses = new File(buildPath);
-        WebResourceRoot resources = new StandardRoot(standardContext);
-        resources.addPreResources(new DirResourceSet(resources, webAppMount, additionalWebInfClasses.getAbsolutePath(),
-                contextPath));
-        standardContext.setResources(resources);
-
-//      start server
-        tomcat.start();
-        tomcat.getServer().await();
     }
 }

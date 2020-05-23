@@ -1,13 +1,15 @@
 package com.sqlclient.entity;
 
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 
 import java.util.List;
 
 @Builder
-@Data
+@Getter
+@ToString
+@EqualsAndHashCode
 public class QueryResult {
-    private List<String> columnName;
-    private List<List<Object>> columnValues;
+    private final String systemInfo;
+    private final List<String> columnNames;
+    private final List<List<Object>> columnValues;
 }

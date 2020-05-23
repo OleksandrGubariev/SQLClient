@@ -1,6 +1,5 @@
 package com.sqlclient.dao.jdbc;
 
-import com.sqlclient.dao.QueryExecuteDao;
 import com.sqlclient.dao.parser.ResultSetParser;
 import com.sqlclient.entity.QueryResult;
 import lombok.RequiredArgsConstructor;
@@ -11,14 +10,14 @@ import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 @Slf4j
 @RequiredArgsConstructor
-public class JdbcQueryExecuteDao implements QueryExecuteDao {
+public class JdbcQueryExecuteDao {
     private final DataSource dataSource;
 
-    @SneakyThrows
-    public QueryResult queryExecuteSelect(String query) {
+    public QueryResult queryExecuteSelect(String query) throws SQLException {
         log.info("Query SELECT execute");
         try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query);
@@ -28,8 +27,7 @@ public class JdbcQueryExecuteDao implements QueryExecuteDao {
         }
     }
 
-    @SneakyThrows
-    public int queryExecute(String query) {
+    public int queryExecute(String query) throws SQLException {
         log.info("Query execute");
         try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
