@@ -34,7 +34,7 @@ public class PropertyReader {
 
     private Properties getProdProperties() {
         try {
-            String dbUrl = System.getenv("JDBC_DATABASE_URL");
+            String dbUrl = System.getenv("DATABASE_URL");
             properties.setProperty("jdbc.url", dbUrl);
 
             String port = System.getenv("PORT");
