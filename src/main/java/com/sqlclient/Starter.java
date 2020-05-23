@@ -16,7 +16,7 @@ import java.util.Properties;
 public class Starter {
     public static void main(String[] args) throws Exception {
 
-        Properties properties = new PropertyReader("application.properties").getProperties();
+        Properties properties = new PropertyReader("application.properties").readProperties();
         DataSource dataSource = new DataSourceFactory(properties).getDataSource();
         JdbcQueryExecuteDao queryExecuteDao = new JdbcQueryExecuteDao(dataSource);
         QueryExecuteService queryExecuteService = new QueryExecuteService(queryExecuteDao);
