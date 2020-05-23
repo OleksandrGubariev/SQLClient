@@ -32,26 +32,22 @@ public class PropertyReader {
         return getDevProperties();
     }
 
-
     private Properties getProdProperties() {
-        Properties properties = new Properties();
-        try (InputStream inputStream = PropertyReader.class.getClassLoader().getResourceAsStream(path);
-             InputStream devPropertiesStream = PropertyReader.class.getClassLoader().getResourceAsStream(DEVELOP_APPLICATION_PROPERTIES)) {
-            if (inputStream == null) {
-                throw new IllegalArgumentException("No properties on path " + path);
-            }
-            properties.load(inputStream);
-            log.debug("Read properties from path: {}", path);
+        try {
+            String dbUrl = System.getenv("JDBC_DATABASE_URL");
+            properties.setProperty("jdbc.url", dbUrl);
 
-            if (devPropertiesStream != null) {
-                properties.load(devPropertiesStream);
-                log.debug("Read properties from path: {}", DEVELOP_APPLICATION_PROPERTIES);
-            }
+            String port = System.getenv("PORT");
+            properties.setProperty("port", port);
+
+            String host = System.getenv("HOST");
+            properties.setProperty("host", host);
+            log.debug("Read prod properties");
 
             return properties;
-        } catch (IOException e) {
-            log.error("Can't read properties file: {} ", path, e);
-            throw new RuntimeException("Can't read properties file " + path, e);
+        } catch (Exception e) {
+            log.error("Error while were trying to get connection properties on production environment", e);
+            throw new RuntimeException("Exception while were trying to get connection properties on production environment", e);
         }
     }
 
